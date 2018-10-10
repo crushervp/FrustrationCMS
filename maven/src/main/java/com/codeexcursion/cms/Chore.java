@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package code.excursion.cms;
+package com.codeexcursion.cms;
 
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tools.ant.Project;

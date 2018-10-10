@@ -1,9 +1,7 @@
-package code.excursion.cms;
+package com.codeexcursion.cms;
 
-import code.excursion.cms.chores.DSLDeploy;
-import code.excursion.cms.chores.LocalDeploy;
-import code.excursion.cms.service.GetConfiguration;
-import code.excursion.cms.util.PrintUtil;
+import com.codeexcursion.cms.service.GetConfiguration;
+import com.codeexcursion.cms.util.PrintUtil;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.tools.ant.Project;
 import org.springframework.boot.CommandLineRunner;
@@ -25,10 +23,7 @@ public class Application implements CommandLineRunner {
       usageInstructions();
       return;
     } 
-    if("local".equalsIgnoreCase(args[0])) {
-      new LocalDeploy(project, configuration).execute();
-    } else if("dsl".equalsIgnoreCase(args[0])) {
-      new DSLDeploy(project, configuration).execute();
+    if("whatever".equalsIgnoreCase(args[0])) {
     } else {
       usageInstructions();
     }

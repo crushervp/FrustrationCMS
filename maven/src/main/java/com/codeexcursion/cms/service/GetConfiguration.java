@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package code.excursion.cms.service;
+package com.codeexcursion.cms.service;
 
 import java.io.File;
-import code.excursion.ant.util.PathsUtil;
-import code.excursion.cms.ApplicationEnum;
+import com.codeexcursion.ant.util.PathsUtil;
+import com.codeexcursion.cms.ApplicationEnum;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
