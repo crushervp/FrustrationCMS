@@ -39,7 +39,7 @@
   
   <dependencies>
     <dependency>
-      <groupId>code.excursion</groupId>
+      <groupId>com.codeexcursion</groupId>
       <artifactId>ant-api-wrapper</artifactId>
       <version>1.00.000</version>
     </dependency>    
