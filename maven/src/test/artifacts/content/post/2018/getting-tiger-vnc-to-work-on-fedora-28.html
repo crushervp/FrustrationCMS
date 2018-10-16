@@ -1,0 +1,345 @@
+<head>
+  <meta name="type" content="post"/>
+  <meta name="title" content="Getting Tiger VNC to Work on Fedora 28."/>
+  <meta name="date" content="2018-08-21"/>
+  <meta name="tags" content="linux, tls, certificate, selinux, file, security, context, xfce, fedora, fedora 28, fedora 27"/>
+  <meta name="status" content="published"/>
+  <meta name="category" content="Tech Article"/>
+</head>
+<p>
+  With Fedora 28 and probably Fedora 27 there have been some changes to the recommended TigerVNC configuration.  If you have an earlier version go to [Getting Tiger VNC to Work on Linux](/post/2016/getting-tigervnc-to-work-on-linux.html).  These changes occurred because the previous configuration started having problems around Fedora 26.  It was running afoul of SELinux and issues with runserver.  This resulted in Tiger VNC throwing odd, and unhelpful, exit errors when starting using systemd.
+</p>
+<!--summary marker-->
+
+<p>
+  At the time of this writing the directions in the [Fedora Documentation](https://docs.fedoraproject.org/en-US/fedora/f28/system-administrators-guide/infrastructure-services/TigerVNC/) hasn't been updated to reflect the changes.  If you have a fresh install of Fedora you can skip the first three steps.  If you have upgraded your Fedora from version 26 and earlier then we want to start by uninstalling Tiger VNC and all of its configuration files.  
+</p>
+<p>
+  The first step is to stop Tiger VNC if it is running.  Despite the systemd startup errors it may indeed be running.  I have used Tiger VNC for several months despite the systemd startup errors.  While you should be able to stop it using systemctl I found that if the startup had errors, stopping it with systemctl doesn't work.  You may need to kill the process.
+</p>
+
+<span class="codeCaption">Stop Tiger VNC</span>
+
+<pre class="terminal">
+[chris ~]$ sudo systemctl stop vncserver@:1
+[chris ~]$ ps -aef | grep vnc
+chris  6443  4589  0 09:13 pts/0    00:00:00 grep &#45;&#45;color&#61;auto vnc
+chris 27325     1  7 Aug20 ?        01:22:23 /usr/bin/Xvnc :1 &#45;auth /home/chris/&#46;Xauthority &#45;desktop 127&#46;0&#46;0&#46;1:1 &#40;chris&#41; &#45;fp catalogue:/etc/X11/fontpath&#46;d &#45;geometry 1024x768 &#45;pn &#45;rfbauth /home/chris/&#46;vnc/passwd &#45;rfbport 5901 &#45;rfbwait 30000
+&#91;chris ~&#93;$ kill 27325
+&#91;chris ~&#93;$ ps &#45;aef | grep vnc
+chris  6470  4589  0 09:14 pts/0    00:00:00 grep &#45;&#45;color&#61;auto vnc
+</pre>
+
+<p>The first step is to remove Tiger VNC.</p>
+
+<terminal>
+&#91;chris ~&#93;$ sudo dnf remove tigervnc&#45;server
+
+Dependencies resolved
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+ Package                              Arch                        Version                            Repository                    Size
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+Removing:
+ tigervnc&#45;server                      x86_64                      1&#46;8&#46;0&#45;7&#46;fc28                       @fedora                      556 k
+
+Transaction Summary
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+Remove  1 Package
+
+Freed space: 556 k
+Is this ok &#91;y/N&#93;: y
+Running transaction check
+Transaction check succeeded&#46;
+Running transaction test
+Transaction test succeeded&#46;
+Running transaction
+  Preparing        :                                                                                                                1/1 
+  Running scriptlet: tigervnc&#45;server&#45;1&#46;8&#46;0&#45;7&#46;fc28&#46;x86_64                                                                            1/1 
+  Erasing          : tigervnc&#45;server&#45;1&#46;8&#46;0&#45;7&#46;fc28&#46;x86_64                                                                            1/1 
+  Running scriptlet: tigervnc&#45;server&#45;1&#46;8&#46;0&#45;7&#46;fc28&#46;x86_64                                                                            1/1 
+  Verifying        : tigervnc&#45;server&#45;1&#46;8&#46;0&#45;7&#46;fc28&#46;x86_64                                                                            1/1 
+
+Removed:
+  tigervnc&#45;server&#46;x86_64 1&#46;8&#46;0&#45;7&#46;fc28                                                                                                   
+
+Complete!
+
+</terminal>
+
+<p>The second step is to remove any unused dependencies.  The output was unwieldy and has been truncated in sections.</p>
+
+<terminal>
+
+&#91;chris ~&#93;$ sudo dnf autoremove
+&#91;sudo&#93; password for chris: 
+Last metadata expiration check: 0:20:25 ago on Tue 21 Aug 2018 08:11:11 AM EDT&#46;
+Dependencies resolved&#46;
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+ Package                                      Arch              Version                                       Repository           Size
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+Removing:
+ NetworkManager&#45;glib                          x86_64            1:1&#46;10&#46;10&#45;1&#46;fc28                              @updates            6&#46;0 M
+ NetworkManager&#45;ppp                           x86_64            1:1&#46;10&#46;10&#45;1&#46;fc28                              @updates             76 k
+ apache&#45;commons&#45;lang                          noarch            2&#46;6&#45;21&#46;fc28                                   @fedora             314 k
+ &#46;&#46;&#46; STUFF OMITTED HERE &#46;&#46;&#46;
+ xerces&#45;c                                     x86_64            3&#46;2&#46;1&#45;1&#46;fc28                                  @fedora             3&#46;9 M
+ xerces&#45;j2                                    noarch            2&#46;11&#46;0&#45;31&#46;fc28                                @fedora             1&#46;3 M
+ xml&#45;commons&#45;resolver                         noarch            1&#46;2&#45;24&#46;fc28                                   @fedora             121 k
+ xml&#45;security&#45;c                               x86_64            1&#46;7&#46;3&#45;4&#46;fc28                                  @fedora             1&#46;2 M
+
+Transaction Summary
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+Remove  71 Packages
+
+Freed space: 143 M
+Is this ok &#91;y/N&#93;: y
+Running transaction check
+Transaction check succeeded&#46;
+Running transaction test
+Transaction test succeeded&#46;
+Running transaction
+  Preparing        :                                                                                                                1/1 
+  Running scriptlet: xalan&#45;j2&#45;2&#46;7&#46;1&#45;34&#46;fc28&#46;noarch                                                                                  1/1 
+  Erasing          : xalan&#45;j2&#45;2&#46;7&#46;1&#45;34&#46;fc28&#46;noarch                                                                                 1/71 
+  Erasing          : xerces&#45;j2&#45;2&#46;11&#46;0&#45;31&#46;fc28&#46;noarch                                                                               2/71 
+  Erasing          : python3&#45;pyOpenSSL&#45;17&#46;3&#46;0&#45;3&#46;fc28&#46;noarch                                                                        3/71 
+ &#46;&#46;&#46; STUFF OMITTED HERE &#46;&#46;&#46;
+  Verifying        : gstreamer&#45;plugins&#45;base&#45;0&#46;10&#46;36&#45;18&#46;fc27&#46;x86_64                                                                68/71 
+  Verifying        : gstreamer&#45;tools&#45;0&#46;10&#46;36&#45;18&#46;fc27&#46;x86_64                                                                       69/71 
+  Verifying        : guava&#45;24&#46;0&#45;3&#46;fc28&#46;noarch                                                                                     70/71 
+  Verifying        : sphinx&#45;2&#46;2&#46;11&#45;7&#46;fc28&#46;x86_64                                                                                  71/71 
+
+Removed:
+  NetworkManager&#45;glib&#46;x86_64 1:1&#46;10&#46;10&#45;1&#46;fc28                      NetworkManager&#45;ppp&#46;x86_64 1:1&#46;10&#46;10&#45;1&#46;fc28                           
+  apache&#45;commons&#45;lang&#46;noarch 2&#46;6&#45;21&#46;fc28                           argyllcms&#46;x86_64 1&#46;9&#46;2&#45;5&#46;fc28                                        
+  bison&#46;x86_64 3&#46;0&#46;4&#45;9&#46;fc28                                        boost&#45;random&#46;x86_64 1&#46;66&#46;0&#45;8&#46;fc28                                    
+  dnfdragora&#45;updater&#46;noarch 1&#46;0&#46;1&#45;10&#46;git20180108&#46;b0e8a66&#46;fc28      dnsmasq&#46;x86_64 2&#46;79&#45;5&#46;fc28                                           
+ &#46;&#46;&#46; STUFF OMITTED HERE &#46;&#46;&#46;
+  xalan&#45;j2&#46;noarch 2&#46;7&#46;1&#45;34&#46;fc28                                    xerces&#45;c&#46;x86_64 3&#46;2&#46;1&#45;1&#46;fc28                                         
+  xerces&#45;j2&#46;noarch 2&#46;11&#46;0&#45;31&#46;fc28                                  xml&#45;commons&#45;resolver&#46;noarch 1&#46;2&#45;24&#46;fc28                              
+  xml&#45;security&#45;c&#46;x86_64 1&#46;7&#46;3&#45;4&#46;fc28                              
+
+Complete!
+
+</terminal>
+
+<p>Our third step is to clean things up.</p>
+
+<terminal>
+
+&#91;chris ~&#93;$ sudo dnf clean all
+72 files removed
+
+</terminal>
+
+
+With Tiger VNC removed from our system we can now proceed with putting it back on the system.  Normally I would expect the service file to automatically be installed when the server is installed.  It isn't and the next bit touches on why.  The Systemd service file for TigerVNC looks different than other service files.  As shown below Tiger VNC's service file has an "&#64;" symbol in its name.  Without going into the details, the result is that you start can multiple instances of Tiger VNC by passing different display numbers to the service file during startup.  The next step is to install Tigeer VNC.
+
+<terminal>
+
+&#91;chris ~&#93;$ sudo dnf install tigervnc&#45;server
+Adobe Systems Incorporated                                                                              8&#46;9 kB/s | 1&#46;9 kB     00:00    
+Fedora 28 &#45; x86_64 &#45; Updates                                                                            572 kB/s |  22 MB     00:39    
+Fedora 28 &#45; x86_64                                                                                      105 kB/s |  60 MB     09:47    
+Last metadata expiration check: 0:00:00 ago on Tue 21 Aug 2018 08:49:10 AM EDT&#46;
+Dependencies resolved&#46;
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+ Package                              Arch                        Version                            Repository                    Size
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+Installing:
+ tigervnc&#45;server                      x86_64                      1&#46;9&#46;0&#45;2&#46;fc28                       updates                      247 k
+
+Transaction Summary
+&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;
+Install  1 Package
+
+Total download size: 247 k
+Installed size: 600 k
+Is this ok &#91;y/N&#93;: y
+Downloading Packages:
+tigervnc&#45;server&#45;1&#46;9&#46;0&#45;2&#46;fc28&#46;x86_64&#46;rpm                                                                 280 kB/s | 247 kB     00:00    
+&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;
+Total                                                                                                   174 kB/s | 247 kB     00:01     
+Running transaction check
+Transaction check succeeded&#46;
+Running transaction test
+Transaction test succeeded&#46;
+Running transaction
+  Preparing        :                                                                                                                1/1 
+  Installing       : tigervnc&#45;server&#45;1&#46;9&#46;0&#45;2&#46;fc28&#46;x86_64                                                                            1/1 
+  Running scriptlet: tigervnc&#45;server&#45;1&#46;9&#46;0&#45;2&#46;fc28&#46;x86_64                                                                            1/1 
+  Verifying        : tigervnc&#45;server&#45;1&#46;9&#46;0&#45;2&#46;fc28&#46;x86_64                                                                            1/1 
+
+Installed:
+  tigervnc&#45;server&#46;x86_64 1&#46;9&#46;0&#45;2&#46;fc28                                                                                                   
+
+Complete!
+
+</terminal>
+
+<p>Next we copy over a service file from the libraries to our Systemd service directory.</p>
+
+<terminal>
+
+&#91;chris&#93;$ sudo cp /lib/systemd/system/vncserver&amp;&#35;64;&#46;service /etc/systemd/system/vncserver&amp;&#35;64;&#46;service
+&#91;sudo&#93; password for chris: 
+&#91;chris&#93;$ 
+
+</terminal>
+
+<p>Now we need to edit the vncserver&#64;.service file to add your our name.  The contents of this file is one part that has changed.  I have provided a before and after look of the file.  In my case I edit the file replacing <user> with my login name "chris".</p>
+
+<terminal>
+
+&#91;Unit&#93;
+  Description&#61;Remote desktop service &#40;VNC&#41;
+  After&#61;syslog&#46;target network&#46;target
+
+  &#91;Service&#93;
+  Type&#61;forking
+  WorkingDirectory&#61;/home/&lt;USER&gt;
+  User&#61;&lt;USER&gt;
+  Group&#61;&lt;USER&gt;
+
+  PIDFile&#61;/home/&lt;USER&gt;/&#46;vnc/%H%i&#46;pid
+
+  ExecStartPre&#61;/bin/sh &#45;c &#39;/usr/bin/vncserver &#45;kill %i &gt; /dev/null 2&gt;&amp;1 || :&#39;
+  ExecStart&#61;/usr/bin/vncserver &#45;autokill %i
+  ExecStop&#61;/usr/bin/vncserver &#45;kill %i
+
+  Restart&#61;on&#45;success
+  RestartSec&#61;15
+
+  &#91;Install&#93;
+  WantedBy&#61;multi&#45;user&#46;target
+  
+</terminal>
+<p>
+The file you copied is owned by the root user and you will want to "sudo vim vncserver&#64;.service" when editing the file.  Or use whatever editor you prefer in place of Vim.  If you use Vim you can run the command `":%s/&lt;User&gt;/username/g"` to place your username in the correct places.  Replace "username" with our user account name.
+</p>
+
+<terminal>
+
+&#91;Unit&#93;
+  Description&#61;Remote desktop service &#40;VNC&#41;
+  After&#61;syslog&#46;target network&#46;target
+
+  &#91;Service&#93;
+  Type&#61;forking
+  WorkingDirectory&#61;/home/chris
+  User&#61;chris
+  Group&#61;chris
+
+  PIDFile&#61;/home/chris/&#46;vnc/%H%i&#46;pid
+
+  ExecStartPre&#61;/bin/sh &#45;c &#39;/usr/bin/vncserver &#45;kill %i &gt; /dev/null 2&gt;&amp;1 || :&#39;
+  ExecStart&#61;/usr/bin/vncserver &#45;autokill %i
+  ExecStop&#61;/usr/bin/vncserver &#45;kill %i
+
+  Restart&#61;on&#45;success
+  RestartSec&#61;15
+
+  &#91;Install&#93;
+  WantedBy&#61;multi&#45;user&#46;target
+  
+</terminal>
+
+<p>
+Now we want to set a VNC password for our user.  The following commands need to be run as the user which you added to the vncserver&#64;.service file.
+</p>
+
+<terminal>
+
+&#91;chris&#93;$ vncpasswd
+Password:
+Verify:
+Would you like to enter a view&#45;only password &#40;y/n&#41;? n
+
+</terminal>
+
+<p>
+Next we want to reload the Systemd configuration.  This is in case you already had Tiger VNC
+configured.  This command has Systemd reread its configurations.
+</p>
+
+<terminal>
+
+&#91;chris&#93;$ sudo systemctl daemon&#45;reload
+
+</terminal>
+
+<p>
+The next step is to start Tiger VNC service, verify its running and check its status.
+</p>
+
+<terminal>
+
+&#91;chris ~&#93;$ sudo systemctl start vncserver@:1
+&#91;sudo&#93; password for chris: 
+&#91;chris ~&#93;$ ps &#45;aef | grep vnc
+chris  6588     1  1 09:28 ?        00:00:00 /usr/bin/Xvnc :1 &#45;auth /home/chris/&#46;Xauthority &#45;desktop achrcwk0900L412:1 &#40;chris&#41; &#45;fp catalogue:/etc/X11/fontpath&#46;d &#45;geometry 1024x768 &#45;pn &#45;rfbauth /home/chris/&#46;vnc/passwd &#45;rfbport 5901 &#45;rfbwait 30000
+chris  6597     1  0 09:28 ?        00:00:00 sh &#45;c &#40;/home/chris/&#46;vnc/xstartup; /usr/bin/vncserver &#45;kill :1&#41; &gt;&gt; &#39;/home/chris/&#46;vnc/achrcwk0900L412:1&#46;log&#39; 2&gt;&amp;1 &amp;
+chris  7083  4589  0 09:29 pts/0    00:00:00 grep &#45;&#45;color&#61;auto vnc
+&#91;chris ~&#93;$ sudo systemctl status vncserver@:1
+● vncserver@:1&#46;service &#45; Remote desktop service &#40;VNC&#41;
+   Loaded: loaded &#40;/etc/systemd/system/vncserver@&#46;service; enabled; vendor preset: disabled&#41;
+   Active: active &#40;running&#41; since Tue 2018&#45;08&#45;21 09:28:58 EDT; 54s ago
+  Process: 6580 ExecStart&#61;/usr/bin/vncserver &#45;autokill :1 &#40;code&#61;exited, status&#61;0/SUCCESS&#41;
+  Process: 6575 ExecStartPre&#61;/bin/sh &#45;c /usr/bin/vncserver &#45;kill :1 &gt; /dev/null 2&gt;&amp;1 || : &#40;code&#61;exited, status&#61;0/SUCCESS&#41;
+ Main PID: 6588 &#40;Xvnc&#41;
+    Tasks: 98 &#40;limit: 4915&#41;
+   Memory: 139&#46;2M
+   CGroup: /system&#46;slice/system&#45;vncserver&#46;slice/vncserver@:1&#46;service
+           ├─6588 /usr/bin/Xvnc :1 &#45;auth /home/chris/&#46;Xauthority &#45;desktop achrcwk0900L412:1 &#40;chris&#41; &#45;fp catalogue:/etc/X11/fontpa&gt;
+           ├─6597 sh &#45;c &#40;/home/chris/&#46;vnc/xstartup; /usr/bin/vncserver &#45;kill :1&#41; &gt;&gt; &#39;/home/chris/&#46;vnc/achrcwk0900L412:1&#46;log&#39; 2&gt;&amp;1&gt;
+           ├─6598 /bin/sh /etc/xdg/xfce4/xinitrc &#45;&#45; vt
+           ├─6605 dbus&#45;launch &#45;&#45;sh&#45;syntax &#45;&#45;exit&#45;with&#45;session
+           ├─6606 /usr/bin/dbus&#45;daemon &#45;&#45;syslog &#45;&#45;fork &#45;&#45;print&#45;pid 5 &#45;&#45;print&#45;address 7 &#45;&#45;session
+           ├─6680 /usr/libexec/imsettings&#45;daemon
+           ├─6684 /usr/libexec/gvfsd
+           ├─6730 /usr/bin/ssh&#45;agent /etc/X11/xinit/Xclients
+           ├─6744 xfce4&#45;session
+           ├─6748 /usr/lib64/xfce4/xfconf/xfconfd
+           ├─6753 xfwm4
+           ├─6757 xfce4&#45;panel
+           ├─6759 Thunar &#45;&#45;daemon
+           ├─6761 xfdesktop
+           ├─6762 xfsettingsd
+           ├─6765 /usr/libexec/xfce&#45;polkit
+           ├─6766 xscreensaver &#45;no&#45;splash
+           ├─6771 nm&#45;applet
+           ├─6775 abrt&#45;applet
+           ├─6782 /usr/bin/python3 /usr/bin/seapplet
+           ├─6783 xfce4&#45;power&#45;manager
+           ├─6784 /usr/libexec/geoclue&#45;2&#46;0/demos/agent
+
+</terminal>
+
+<p>
+Now lets make sure that our server starts when our workstation starts up.
+</p>
+
+<terminal>
+
+&#91;chris ~&#93;$ sudo systemctl enable vncserver@:1
+
+</terminal>
+
+<p>
+After all that it is still possible that Tiger VNC will not start.  If you look in /var/log/messages there may be a line saying thate systemd cannot write to a PID file. This could be due to SELinux and you can fix it by changing the SELinux properties for systemd as shown below.  The commands below will not work prop
+</p>
+
+<terminal>
+
+&#91;chris ~&#93;$ sudo ausearch -c 'systemd' --raw | sudo audit2allow -M my-systemd
+&#91;chris ~&#93;$ sudo semodule -X 300 -i my-systemd.pp
+
+</terminal>
+
+<p>
+The last step of the server setup is to open up your firewall.  If you are using firewalld you can run firewall-config and select "vnc-server" under services in the runtime and permanent configurations.  If you are using a different firewall you will probably want to open up ports 5900 to 6000.
+</p>
+<p>
+The next step is to download the [Tiger VNC Client](https://github.com/TigerVNC/tigervnc/releases) from their GitHub site.  From there you can follow the links to the latest download site.  The client is a straight binary executable without an install program.  Drop it in a folder and run it.  The last tricky bit is you will need to add a ":1" to the end of your DNS/IP address to tell the client which display number to connect to.
+</p>
+
