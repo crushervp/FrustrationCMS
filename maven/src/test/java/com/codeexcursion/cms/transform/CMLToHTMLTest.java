@@ -28,6 +28,11 @@ public class CMLToHTMLTest {
             Elements terminals = html.select("terminal");
             Assert.assertTrue("Did not find multiple terminal tags.", terminals.size() > 6);
 
+            Elements metaType = html.select("meta[name=type]");
+            Assert.assertTrue("Did not find meta tag of type.", metaType.size() == 1);
+            Assert.assertEquals("Did not find meta tag of type.", "post", metaType.get(0).attr("content"));
+
+
         } catch (IOException exception) {
             Assert.fail("Unable to find file " + htmlFile.getAbsolutePath());
         }
