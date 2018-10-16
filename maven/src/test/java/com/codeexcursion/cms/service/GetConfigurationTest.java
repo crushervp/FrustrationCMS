@@ -17,7 +17,6 @@ public class GetConfigurationTest {
 public void setCwd() {
   origWd = System.getProperty(USER_DIR);  
   File baseDir = Paths.get("src/test/artifacts").toFile();
-  String path = baseDir.getAbsolutePath();
   System.setProperty(USER_DIR, baseDir.getAbsolutePath());
 }
 
