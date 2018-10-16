@@ -13,7 +13,7 @@ public class GetConfigurationTest {
 
 @Before
 public void setPwd() {
-  File baseDir = Paths.get("src/test").toFile();
+  File baseDir = Paths.get("src/test/artifacts").toFile();
   String path = baseDir.getAbsolutePath();
   System.setProperty("user.dir", baseDir.getAbsolutePath());
 }
