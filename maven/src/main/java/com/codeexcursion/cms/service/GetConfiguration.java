@@ -23,11 +23,13 @@ public class GetConfiguration {
 
   public GetConfiguration() {
     Configurations configurations = new Configurations();
+
     File file = PathsUtil.getFile(ApplicationEnum.CONFIGURATION_FILE.toString());
+    ;
     try {
-      configuration = configurations.properties(file);
+      configuration = configurations.properties(file.getAbsoluteFile());
     } catch (ConfigurationException exception) {
-      throw new BuildException(exception);
+      throw new BuildException("Unable to locate: " + file.toString(), exception);
     }
   }
 
