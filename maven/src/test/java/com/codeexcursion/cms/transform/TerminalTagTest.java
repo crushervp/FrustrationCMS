@@ -36,8 +36,8 @@ public class TerminalTagTest {
             Elements preTerminals = html.select("pre[class=terminal]");
             Assert.assertTrue("Should not find any terminal pre tags.", preTerminals.size() < 1);
 
-            Element code = terminals.get(0);
-            new TerminalTag(code);
+            Element terminal = terminals.get(0);
+            new TerminalTag(terminal);
 
             captions = html.select("span[class=codeCaption]");
             Assert.assertTrue("Should find at least one terminal caption.", captions.size() > 0);
