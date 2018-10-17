@@ -55,6 +55,11 @@
         <artifactId>jsoup</artifactId>
         <version>1.11.3</version>
     </dependency>
+    <dependency>
+        <groupId>com.vladsch.flexmark</groupId>
+        <artifactId>flexmark-all</artifactId>
+        <version>0.34.48</version>
+    </dependency>
 
     <dependency>
       <groupId>org.apache.commons</groupId>
