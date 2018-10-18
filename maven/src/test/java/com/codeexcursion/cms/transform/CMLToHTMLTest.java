@@ -118,18 +118,11 @@ public class CMLToHTMLTest {
             Map<String, List<String>> metaData = yamlVisitor.getData();            
             Assert.assertTrue("Did not find meta data.", metaData.size() > 5);
             Assert.assertNotNull("Did not find type meta data.", metaData.get("type"));
-            System.out.println(metaData.get("type"));
-            System.out.println(metaData.get("type").get(0));
-            System.out.println(metaData.get("type").get(0));
-            System.out.println(metaData.get("type").get(0));
-            System.out.println(metaData.get("type").get(0));
-            System.out.println(metaData.get("type").get(0));
             Assert.assertEquals("Did not find type meta data.", "'post'", metaData.get("type").get(0));
             
             
             
             String markdownHtml = renderer.render(markdownDocument);  
-            System.out.println(markdownHtml);
 
             Document html = Jsoup.parse(markdownHtml, "UTF-8");
 
