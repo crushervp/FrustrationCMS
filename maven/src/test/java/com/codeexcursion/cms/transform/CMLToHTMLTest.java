@@ -20,9 +20,11 @@ import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
 import com.vladsch.flexmark.html.HtmlRenderer;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.util.options.MutableDataSet;
+import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class CMLToHTMLTest {
 
@@ -139,4 +141,26 @@ public class CMLToHTMLTest {
         }
     }    
 
+    @Test
+    public void jbakeFrontMatterTest() {
+        Path markdownFile = Paths.get("src/test/artifacts/content/post/2018/grep-file-display-unique-values.md");
+        String jbakeDelimeter = "~~~~~~";
+        try {
+            String markdown = new String(Files.readAllBytes(markdownFile));
+            Assert.assertTrue("Not a jbake file.", markdown.contains(jbakeDelimeter));
+            String[] markdownParts = markdown.split(jbakeDelimeter);
+            Assert.assertNotNull("Front matter should not be null.", markdownParts[0]);
+            Assert.assertNotNull("Markdown should not be null.", markdownParts[1]);
+            
+            Properties metadata = new Properties();
+            metadata.load(new StringReader(markdownParts[0]));
+            
+            Assert.assertEquals("Type did not match", "tip", metadata.get("type"));
+            
+        } catch (IOException exception) {
+            Assert.fail("Unable to find file " + markdownFile.toAbsolutePath());
+        }
+    }    
+    
+    
 }
