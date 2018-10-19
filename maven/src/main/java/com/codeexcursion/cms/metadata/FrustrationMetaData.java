@@ -23,15 +23,21 @@ public class FrustrationMetaData {
     public static Map<String, List<String>> get(Document html) {
       Optional.ofNullable(html).orElseThrow(IllegalArgumentException::new);
       Map<String, List<String>> metadata = new HashMap<>();
-      Elements terminals = html.select("meta");
+      
+      String k3y = MetadataK3ysEnum.TYPE.name().toLowerCase();
+      metadata.put(k3y, getContent(k3y, html));
       
         
       return Optional.ofNullable(metadata).orElseGet(() -> new HashMap<String, List<String>>());
     }
-    
+
+
+    private static List<String> getContent(String k3y, Document html) {
+      return getContent(html.select("meta[name=" + k3y + "]"));
+    }    
     
 
-    private List<String> getContent(Elements elements) {
+    private static List<String> getContent(Elements elements) {
       List<String> returnObject = null;
       String k3y = "content";
       if(elements != null) {
