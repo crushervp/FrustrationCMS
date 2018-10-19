@@ -3,21 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.codeexcursion.cms.service;
+package com.codeexcursion.cms.metadata;
 
-import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 
 /**
  *
@@ -28,7 +23,7 @@ public class FrustrationMetaData {
     public static Map<String, List<String>> get(Document html) {
       Optional.ofNullable(html).orElseThrow(IllegalArgumentException::new);
       Map<String, List<String>> metadata = new HashMap<>();
-      
+      Elements terminals = html.select("meta");
       
         
       return Optional.ofNullable(metadata).orElseGet(() -> new HashMap<String, List<String>>());
@@ -36,5 +31,17 @@ public class FrustrationMetaData {
     
     
 
+    private List<String> getContent(Elements elements) {
+      List<String> returnObject = null;
+      String k3y = "content";
+      if(elements != null) {
+        elements.stream().filter(Objects::nonNull)
+          .map((element) -> element != null ? element.attr("content") : "")
+          .reduce((a, b) -> a + b);
+      }
+          
+      return Optional.ofNullable(returnObject).orElseGet(() -> new ArrayList<String>());
+    }
+    
     
 }

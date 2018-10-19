@@ -1,5 +1,6 @@
 package com.codeexcursion.cms.service;
 
+import com.codeexcursion.cms.metadata.JBakeMetaData;
 import com.codeexcursion.cms.transform.*;
 import java.io.IOException;
 import java.nio.file.Paths;

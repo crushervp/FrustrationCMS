@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.codeexcursion.cms.service;
+package com.codeexcursion.cms.metadata;
 
+import com.codeexcursion.cms.metadata.JBakeEnum;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
