@@ -39,7 +39,6 @@ public class FrustrationMetaData {
 
     private static List<String> getContent(Elements elements) {
       List<String> returnObject = null;
-      String k3y = "content";
       if(elements != null) {
         elements.stream().filter(Objects::nonNull)
           .map((element) -> element != null ? element.attr("content") : "")

@@ -35,6 +35,27 @@ public class ParseJBakeTest {
     }
 
     @Test
+    public void notJBakeTest() {
+        Path isNotJbake = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
+
+        try {
+            String text = new String(Files.readAllBytes(isNotJbake));
+            try {
+                Map<String, List<String>> metadata = new ParseJBake(text).getMetadata();
+              Assert.fail("IllegalArgumentException was not thrown.");
+            } catch(IllegalArgumentException exception) {
+              //Exception was expected.
+            }
+
+        } catch (IOException exception) {
+            Assert.fail("Unable to read file " + isNotJbake);
+        }
+
+    }
+
+
+
+    @Test
     public void getMetaDataTest() {
         Path isJbake = Paths.get("src/test/artifacts/content/post/2018/grep-file-display-unique-values.md");
         Path isNotJbake = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
