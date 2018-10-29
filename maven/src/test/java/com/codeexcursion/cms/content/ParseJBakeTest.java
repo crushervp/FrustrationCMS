@@ -1,4 +1,4 @@
-package com.codeexcursion.cms.service;
+package com.codeexcursion.cms.content;
 
 import com.codeexcursion.cms.metadata.JBakeMetaData;
 import com.codeexcursion.cms.transform.*;
@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 
-public class JBakeMetaDataTest {
+public class ParseJBakeTest {
 
     @Test
     public void isJbakeTest() {
@@ -23,10 +23,10 @@ public class JBakeMetaDataTest {
         try {
             String text = new String(Files.readAllBytes(isJbake));
             
-            Assert.assertTrue("JBake file misidentified", JBakeMetaData.isJBake(text));
+            Assert.assertTrue("JBake file misidentified", ParseJBake.isJBake(text));
 
             text = new String(Files.readAllBytes(isNotJbake));
-            Assert.assertFalse("Non JBake file misidentified", JBakeMetaData.isJBake(text));
+            Assert.assertFalse("Non JBake file misidentified", ParseJBake.isJBake(text));
             
         } catch (IOException exception) {
             Assert.fail("Unable to read file " + isJbake);
@@ -35,22 +35,24 @@ public class JBakeMetaDataTest {
     }
 
     @Test
-    public void getTest() {
+    public void getMetaDataTest() {
         Path isJbake = Paths.get("src/test/artifacts/content/post/2018/grep-file-display-unique-values.md");
         Path isNotJbake = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
 
         try {
             String text = new String(Files.readAllBytes(isJbake));
-            Map<String, List<String>> metadata = JBakeMetaData.get(text);
+            Map<String, List<String>> metadata = new ParseJBake(text).getMetadata();
             Assert.assertNotNull("Failed to get metadata map.", metadata);
             Assert.assertNotNull("Failed to find 'type' in metadata map.", metadata.get("type"));
             Assert.assertEquals("Failed to find 'tip' in 'type' in metadata map.", "tip", metadata.get("type").get(0));
 
             text = new String(Files.readAllBytes(isNotJbake));
-            metadata = JBakeMetaData.get(text);
-            Assert.assertNotNull("Failed to get metadata map.", metadata);
-            Assert.assertNull("Found 'type' in metadata map where one should not be.", metadata.get("type"));
-
+            try {
+              metadata = new ParseJBake(text).getMetadata();
+              Assert.fail("IllegalArgumentException was not thrown.");
+            } catch(IllegalArgumentException exception) {
+              //Exception was expected.
+            }
 
         } catch (IOException exception) {
             Assert.fail("Unable to read file " + isJbake);
@@ -58,5 +60,20 @@ public class JBakeMetaDataTest {
 
     }
     
-    
+    @Test
+    public void getContentTest() {
+        Path isJbake = Paths.get("src/test/artifacts/content/post/2018/grep-file-display-unique-values.md");
+        Path isNotJbake = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
+
+        try {
+            String text = new String(Files.readAllBytes(isJbake));
+            String content = new ParseJBake(text).getContent();
+            Assert.assertNotNull("Failed to get content.", content);
+            Assert.assertTrue("Failed to get content.", content.length() > 100);
+
+        } catch (IOException exception) {
+            Assert.fail("Unable to read file " + isJbake);
+        }
+
+    }    
 }

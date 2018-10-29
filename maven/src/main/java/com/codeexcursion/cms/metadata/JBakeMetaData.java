@@ -5,7 +5,6 @@
  */
 package com.codeexcursion.cms.metadata;
 
-import com.codeexcursion.cms.metadata.JBakeEnum;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -25,33 +24,13 @@ import java.util.regex.Pattern;
  */
 public class JBakeMetaData {
     
-    public static Map<String, List<String>> get(String text) {
+    public static Map<String, List<String>> get(String metadataTextBlock) {
       Map<String, List<String>> metadata = null;
-      if(isJBake(text)) {
-        metadata = propertiesToMetadataMap(getProperties(getFrontMatter(text)));
-      }
+      metadata = propertiesToMetadataMap(getProperties(metadataTextBlock));
         
       return Optional.ofNullable(metadata).orElseGet(() -> new HashMap<String, List<String>>());
     }
     
-    
-    public static boolean isJBake(String text) {
-      boolean returnValue = false;
-      if(text == null) {
-          return returnValue;
-      }
-      
-      Pattern pattern = Pattern.compile("^" + JBakeEnum.DELIMETER + "$", Pattern.MULTILINE);
-      Matcher matcher = pattern.matcher(text);
-      
-      returnValue = matcher.find();
-        
-      return returnValue;
-    }
-    
-    private static String getFrontMatter(String text) {
-      return text.split(JBakeEnum.DELIMETER.toString())[0];
-    }
     
     private static Properties getProperties(String frontMatter) {
       Properties returnObject = new Properties();
