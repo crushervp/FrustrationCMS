@@ -1,19 +1,18 @@
 package com.codeexcursion.cms.content;
 
-import com.codeexcursion.cms.metadata.JBakeMetaData;
-import com.codeexcursion.cms.transform.*;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 
-public class ParseJBakeTest {
+public class JBakeTest {
 
     @Test
     public void isJbakeTest() {
@@ -23,10 +22,10 @@ public class ParseJBakeTest {
         try {
             String text = new String(Files.readAllBytes(isJbake));
             
-            Assert.assertTrue("JBake file misidentified", ParseJBake.isJBake(text));
+            Assert.assertTrue("JBake file misidentified", JBake.isJBake(text));
 
             text = new String(Files.readAllBytes(isNotJbake));
-            Assert.assertFalse("Non JBake file misidentified", ParseJBake.isJBake(text));
+            Assert.assertFalse("Non JBake file misidentified", JBake.isJBake(text));
             
         } catch (IOException exception) {
             Assert.fail("Unable to read file " + isJbake);
@@ -41,7 +40,7 @@ public class ParseJBakeTest {
         try {
             String text = new String(Files.readAllBytes(isNotJbake));
             try {
-                Map<String, List<String>> metadata = new ParseJBake(text).getMetadata();
+                Optional<Map<String, List<String>>> metadata = new JBake(text).getMetadata();
               Assert.fail("IllegalArgumentException was not thrown.");
             } catch(IllegalArgumentException exception) {
               //Exception was expected.
@@ -62,14 +61,14 @@ public class ParseJBakeTest {
 
         try {
             String text = new String(Files.readAllBytes(isJbake));
-            Map<String, List<String>> metadata = new ParseJBake(text).getMetadata();
+            Optional<Map<String, List<String>>> metadata = new JBake(text).getMetadata();
             Assert.assertNotNull("Failed to get metadata map.", metadata);
-            Assert.assertNotNull("Failed to find 'type' in metadata map.", metadata.get("type"));
-            Assert.assertEquals("Failed to find 'tip' in 'type' in metadata map.", "tip", metadata.get("type").get(0));
+            Assert.assertNotNull("Failed to find 'type' in metadata map.", metadata.get().get("type"));
+            Assert.assertEquals("Failed to find 'tip' in 'type' in metadata map.", "tip", metadata.get().get("type").get(0));
 
             text = new String(Files.readAllBytes(isNotJbake));
             try {
-              metadata = new ParseJBake(text).getMetadata();
+              metadata = new JBake(text).getMetadata();
               Assert.fail("IllegalArgumentException was not thrown.");
             } catch(IllegalArgumentException exception) {
               //Exception was expected.
@@ -88,9 +87,9 @@ public class ParseJBakeTest {
 
         try {
             String text = new String(Files.readAllBytes(isJbake));
-            String content = new ParseJBake(text).getContent();
+            Optional<String> content = new JBake(text).getContent();
             Assert.assertNotNull("Failed to get content.", content);
-            Assert.assertTrue("Failed to get content.", content.length() > 100);
+            Assert.assertTrue("Failed to get content.", content.get().length() > 100);
 
         } catch (IOException exception) {
             Assert.fail("Unable to read file " + isJbake);

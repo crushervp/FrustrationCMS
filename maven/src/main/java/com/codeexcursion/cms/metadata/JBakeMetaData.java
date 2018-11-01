@@ -20,13 +20,12 @@ import java.util.Set;
  *
  * @author chris
  */
-public class JBakeMetaData {
+public final class JBakeMetaData {
     
-    public static Map<String, List<String>> get(String metadataTextBlock) {
+    public static Optional<Map<String, List<String>>> get(String metadataTextBlock) {
       Map<String, List<String>> metadata = null;
-      metadata = propertiesToMetadataMap(getProperties(metadataTextBlock));
-        
-      return Optional.ofNullable(metadata).orElseGet(() -> new HashMap<String, List<String>>());
+      metadata = propertiesToMetadataMap(getProperties(metadataTextBlock));        
+      return Optional.ofNullable(metadata);
     }
     
     

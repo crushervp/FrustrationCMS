@@ -54,7 +54,7 @@ public final class Jekyll {
         return document;
     }
 
-    public Optional<String> getHTML() {
+    public final Optional<String> getHTML() {
         return html;
     }
     

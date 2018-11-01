@@ -19,39 +19,40 @@ import java.util.regex.Pattern;
  *
  * @author chris
  */
-public class ParseJBake {
-    private Map<String, List<String>> metadata;
-    private String content;
-    private String[] metadataAndContent;
+public final class JBake {
+    private final Optional<Map<String, List<String>>> metadata;
+    private final Optional<String> content;
 
-    public ParseJBake(String text) {
+    public JBake(String text) {
       Optional.ofNullable(text).orElseThrow(this::throwNotJBake);
       if(isJBake(text)) {
-        metadataAndContent = text.split(JBakeEnum.DELIMETER.toString());
-        if(metadataAndContent == null || metadataAndContent.length < 2) {
-          throw throwNotJBake();
+        String[] metadataAndContent = text.split(JBakeEnum.DELIMETER.toString());
+        if(metadataAndContent != null || metadataAndContent.length > 1) {
+          content = Optional.ofNullable(metadataAndContent[1]);
+          metadata = JBakeMetaData.get(metadataAndContent[0]);
+        } else {
+          content = Optional.empty();
+          metadata = Optional.empty();
         }
-        content = metadataAndContent[1];
-        metadata = JBakeMetaData.get(metadataAndContent[0]);
       } else {
         throw throwNotJBake();
       }
     }
 
-    private IllegalArgumentException throwNotJBake() {
+    private final IllegalArgumentException throwNotJBake() {
       return new IllegalArgumentException("JBake content must not be null and must contain a JBake header delimeted by '~~~~~~'.");
     }
 
-    public Map<String, List<String>> getMetadata() {
-      return Optional.ofNullable(metadata).orElseGet(() -> new HashMap<String, List<String>>());
+    public final Optional<Map<String, List<String>>> getMetadata() {
+      return metadata;
     }
     
-    public String getContent() {
-      return Optional.ofNullable(content).orElseGet(() -> "");
+    public final Optional<String> getContent() {
+      return content;
     }
     
     
-    public static boolean isJBake(String text) {
+    public static final boolean isJBake(String text) {
       boolean returnValue = false;
       if(text == null) {
           return returnValue;
