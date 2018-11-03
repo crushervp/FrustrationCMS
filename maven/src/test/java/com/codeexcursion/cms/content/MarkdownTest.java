@@ -1,12 +1,16 @@
 package com.codeexcursion.cms.content;
 
 import com.vladsch.flexmark.ast.Document;
+import com.vladsch.flexmark.ext.yaml.front.matter.YamlFrontMatterExtension;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.Assert;
@@ -62,4 +66,55 @@ public class MarkdownTest {
     }
     
 
+    @Test
+    public void codeBlockTest1() {
+        String text = "<code caption=\"bob\">for(int i = 0; i < 20;i++) {\n" +
+                      "//do nothing\n" +
+                      "}</code>";
+            Optional<String> html = Markdown.getHTML(null, text);
+            Assert.assertTrue("HTML should not be null", html.isPresent());
+            Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
+//            System.out.println(html);
+
+    }
+
+    @Test
+    public void codeBlockTest2() {
+        String text = "    for(int i = 0; i < 20;i++) {\n" +
+                      "      //do nothing for now\n" +
+                      "    }\n";
+            Optional<String> html = Markdown.getHTML(null, text);
+            Assert.assertTrue("HTML should not be null", html.isPresent());
+            Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
+//            System.out.println(html);
+
+    }
+
+    @Test
+    public void codeBlockTest3() {
+        String text = "<pre>for(int i = 0; i < 20;i++) {\n" +
+                      "      //do nothing for now\n" +
+                      "    }</pre>";
+            Optional<String> html = Markdown.getHTML(null, text);
+            Assert.assertTrue("HTML should not be null", html.isPresent());
+            Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
+ //           System.out.println(html);
+
+    }
+    
+    
+    
+    @Test
+    public void codeTerminalTest1() {
+        String text = "<terminal>for(int i = 0; i < 20;i++) {\n" +
+                      "//do nothing\n" +
+                      "}</terminal>";
+            Optional<String> html = Markdown.getHTML(null, text);
+            Assert.assertTrue("HTML should not be null", html.isPresent());
+            Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
+
+    }
+
+    
+    
 }
