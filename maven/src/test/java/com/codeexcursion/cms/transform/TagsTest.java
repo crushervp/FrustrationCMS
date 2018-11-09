@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.TextNode;
 
 public class TagsTest {
 
@@ -48,16 +49,6 @@ public class TagsTest {
     }
 
     @Test
-    public void getCodeTitleNullTest() {
-            Optional<Element> optionalResult = Tags.getCaption(null);
-
-            Assert.assertNotNull("Optional result should not be null.", optionalResult);
-            Assert.assertFalse("Code caption should not have value.", optionalResult.isPresent());
-            
-    }
-
-
-    @Test
     public void getCodeTitleWrongElementTest() {
             Optional<Element> optionalResult = Tags.getCaption(new Element("div"));
 
@@ -89,14 +80,10 @@ public class TagsTest {
             Elements preTerminals = html.select("pre[class=prettifyprint]");
             Assert.assertTrue("Should not find any code pre tags.", preTerminals.size() < 1);
 
-            Optional<Element> optionalResult = Tags.getContent(codes.get(0), "prettifyprint");
+            Element result = Tags.getContent(codes.get(0), "prettifyprint");
 
-            Assert.assertNotNull("Code body should not be null.", optionalResult);
-            Assert.assertTrue("Code body should have value.", optionalResult.isPresent());
+            Assert.assertNotNull("Code body should not be null.", result);
             
-            
-            Element result = optionalResult.get();
-
             Assert.assertTrue("Should find pre tag.", result.nodeName().equals("pre"));
 
             Assert.assertTrue("Pre tag should have prettifyprint class.", result.hasClass("prettifyprint"));
@@ -109,12 +96,32 @@ public class TagsTest {
     
     
     @Test
-    public void getContentNullTest() {
-            Optional<Element> optionalResult = Tags.getContent(null, null);
+    public void nullTest() {
+        
+        try{
+            Tags.getContent(null);
+            Assert.fail("IllegalArgumentException not thrown for getContent(null)");
+        } catch(IllegalArgumentException exception) {
+          // Do nothing  
+        }
 
-            Assert.assertNotNull("Optional result should not be null.", optionalResult);
-            Assert.assertFalse("Code body should not have value.", optionalResult.isPresent());
-            
+        try{
+            Element element = new Element("code");
+            element.appendChild(new TextNode("Test"));              
+            Tags.getContent(element, null);
+            Assert.fail("IllegalArgumentException not thrown for getContent(object, null)");
+        } catch(IllegalArgumentException exception) {
+          // Do nothing  
+        }
+
+        try{
+            Tags.getCaption(null);
+            Assert.fail("IllegalArgumentException not thrown for getCaption(null)");
+        } catch(IllegalArgumentException exception) {
+          // Do nothing  
+        }
+        
+        
     }
     
     
