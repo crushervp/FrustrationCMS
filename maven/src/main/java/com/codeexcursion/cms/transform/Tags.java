@@ -20,10 +20,16 @@ public final class Tags {
     }
 
     public final static Element getContent(Element node, String cssClass) {
-        Optional.ofNullable(node).orElseThrow(IllegalArgumentException::new);
-        cssClass = Optional.ofNullable(cssClass).orElseGet(() -> "");
-        Element returnNode = new Element("pre");
+        Optional.ofNullable(cssClass).orElseThrow(IllegalArgumentException::new);
+        Element returnNode = getContent(node);
         returnNode.attr("class", cssClass);
+        returnNode.appendChild(new TextNode(node.html()));
+        return returnNode;
+    }
+    
+    public final static Element getContent(Element node) {
+        Optional.ofNullable(node).orElseThrow(IllegalArgumentException::new);
+        Element returnNode = new Element("pre");
         returnNode.appendChild(new TextNode(node.html()));
         return returnNode;
     }

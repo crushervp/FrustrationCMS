@@ -20,17 +20,15 @@ import org.jsoup.Jsoup;
 public final class HTML {
 
     public static final Optional<String> transform(String html) {
-        String returnValue = null;
-        if(html != null) {
-            Document htmlDocument = Jsoup.parse(html);
-            Elements terminals = htmlDocument.select("terminal");
-            Optional.ofNullable(terminals).ifPresent(HTML::handleTerminals);
+        Optional.ofNullable(html).orElseThrow(IllegalArgumentException::new);
+        Document htmlDocument = Jsoup.parse(html);
+        Elements terminals = htmlDocument.select("terminal");
+        Optional.ofNullable(terminals).ifPresent(HTML::handleTerminals);
 
-            Elements codeBlocks = htmlDocument.select("code");
-            Optional.ofNullable(codeBlocks).ifPresent(HTML::handleCodeBlocks);
+        Elements codeBlocks = htmlDocument.select("code");
+        Optional.ofNullable(codeBlocks).ifPresent(HTML::handleCodeBlocks);
 
-        }
-        return Optional.ofNullable(returnValue);
+        return Optional.ofNullable(htmlDocument.html());
     }
 
 
