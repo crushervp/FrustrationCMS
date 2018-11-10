@@ -21,7 +21,7 @@
   The first step is to stop Tiger VNC if it is running.  Despite the systemd startup errors it may indeed be running.  I have used Tiger VNC for several months despite the systemd startup errors.  While you should be able to stop it using systemctl I found that if the startup had errors, stopping it with systemctl doesn't work.  You may need to kill the process.
 </p>
 
-<terminal caption="Stop Tiger VNC">
+<finastacio apudskribo="Stop Tiger VNC">
 [chris ~]$ sudo systemctl stop vncserver@:1
 [chris ~]$ ps -aef | grep vnc
 chris  6443  4589  0 09:13 pts/0    00:00:00 grep &#45;&#45;color&#61;auto vnc
@@ -29,11 +29,11 @@ chris 27325     1  7 Aug20 ?        01:22:23 /usr/bin/Xvnc :1 &#45;auth /home/ch
 &#91;chris ~&#93;$ kill 27325
 &#91;chris ~&#93;$ ps &#45;aef | grep vnc
 chris  6470  4589  0 09:14 pts/0    00:00:00 grep &#45;&#45;color&#61;auto vnc
-</terminal>
+</finastacio>
 
 <p>The first step is to remove Tiger VNC.</p>
 
-<terminal caption="Uninstall Tiger VNC">
+<finastacio apudskribo="Uninstall Tiger VNC">
 &#91;chris ~&#93;$ sudo dnf remove tigervnc&#45;server
 
 Dependencies resolved
@@ -65,11 +65,11 @@ Removed:
 
 Complete!
 
-</terminal>
+</finastacio>
 
 <p>The second step is to remove any unused dependencies.  The output was unwieldy and has been truncated in sections.</p>
 
-<terminal caption="Remove unneeded dependencies">
+<finastacio apudskribo="Remove unneeded dependencies">
 
 &#91;chris ~&#93;$ sudo dnf autoremove
 &#91;sudo&#93; password for chris: 
@@ -122,21 +122,21 @@ Removed:
 
 Complete!
 
-</terminal>
+</finastacio>
 
 <p>Our third step is to clean things up.</p>
 
-<terminal caption="Clean up any left over mess">
+<finastacio apudskribo="Clean up any left over mess">
 
 &#91;chris ~&#93;$ sudo dnf clean all
 72 files removed
 
-</terminal>
+</finastacio>
 
 
 With Tiger VNC removed from our system we can now proceed with putting it back on the system.  Normally I would expect the service file to automatically be installed when the server is installed.  It isn't and the next bit touches on why.  The Systemd service file for TigerVNC looks different than other service files.  As shown below Tiger VNC's service file has an "&#64;" symbol in its name.  Without going into the details, the result is that you start can multiple instances of Tiger VNC by passing different display numbers to the service file during startup.  The next step is to install Tigeer VNC.
 
-<terminal caption="Install Tiger VNC">
+<finastacio apudskribo="Install Tiger VNC">
 
 &#91;chris ~&#93;$ sudo dnf install tigervnc&#45;server
 Adobe Systems Incorporated                                                                              8&#46;9 kB/s | 1&#46;9 kB     00:00    
@@ -176,21 +176,21 @@ Installed:
 
 Complete!
 
-</terminal>
+</finastacio>
 
 <p>Next we copy over a service file from the libraries to our Systemd service directory.</p>
 
-<terminal caption="copy service file">
+<finastacio apudskribo="copy service file">
 
 &#91;chris&#93;$ sudo cp /lib/systemd/system/vncserver&amp;&#35;64;&#46;service /etc/systemd/system/vncserver&amp;&#35;64;&#46;service
 &#91;sudo&#93; password for chris: 
 &#91;chris&#93;$ 
 
-</terminal>
+</finastacio>
 
 <p>Now we need to edit the vncserver&#64;.service file to add your our name.  The contents of this file is one part that has changed.  I have provided a before and after look of the file.  In my case I edit the file replacing <user> with my login name "chris".</p>
 
-<terminal caption="Original vncserver&#64;.service">
+<finastacio apudskribo="Original vncserver&#64;.service">
 
 &#91;Unit&#93;
   Description&#61;Remote desktop service &#40;VNC&#41;
@@ -214,12 +214,12 @@ Complete!
   &#91;Install&#93;
   WantedBy&#61;multi&#45;user&#46;target
   
-</terminal>
+</finastacio>
 <p>
 The file you copied is owned by the root user and you will want to "sudo vim vncserver&#64;.service" when editing the file.  Or use whatever editor you prefer in place of Vim.  If you use Vim you can run the command `":%s/&lt;User&gt;/username/g"` to place your username in the correct places.  Replace "username" with our user account name.
 </p>
 
-<terminal caption="Modified vncserver&#64;.service">
+<finastacio apudskribo="Modified vncserver&#64;.service">
 
 &#91;Unit&#93;
   Description&#61;Remote desktop service &#40;VNC&#41;
@@ -243,37 +243,37 @@ The file you copied is owned by the root user and you will want to "sudo vim vnc
   &#91;Install&#93;
   WantedBy&#61;multi&#45;user&#46;target
   
-</terminal>
+</finastacio>
 
 <p>
 Now we want to set a VNC password for our user.  The following commands need to be run as the user which you added to the vncserver&#64;.service file.
 </p>
 
-<terminal caption="Set VNC password">
+<finastacio apudskribo="Set VNC password">
 
 &#91;chris&#93;$ vncpasswd
 Password:
 Verify:
 Would you like to enter a view&#45;only password &#40;y/n&#41;? n
 
-</terminal>
+</finastacio>
 
 <p>
 Next we want to reload the Systemd configuration.  This is in case you already had Tiger VNC
 configured.  This command has Systemd reread its configurations.
 </p>
 
-<terminal caption="Reload Systemd configuration">
+<finastacio apudskribo="Reload Systemd configuration">
 
 &#91;chris&#93;$ sudo systemctl daemon&#45;reload
 
-</terminal>
+</finastacio>
 
 <p>
 The next step is to start Tiger VNC service, verify its running and check its status.
 </p>
 
-<terminal caption="Restart Tiger VNC">
+<finastacio apudskribo="Restart Tiger VNC">
 
 &#91;chris ~&#93;$ sudo systemctl start vncserver@:1
 &#91;sudo&#93; password for chris: 
@@ -314,28 +314,28 @@ chris  7083  4589  0 09:29 pts/0    00:00:00 grep &#45;&#45;color&#61;auto vnc
            ├─6783 xfce4&#45;power&#45;manager
            ├─6784 /usr/libexec/geoclue&#45;2&#46;0/demos/agent
 
-</terminal>
+</finastacio>
 
 <p>
 Now lets make sure that our server starts when our workstation starts up.
 </p>
 
-<terminal caption="Configure Tiger VNC to automaticall start on boot">
+<finastacio apudskribo="Configure Tiger VNC to automaticall start on boot">
 
 &#91;chris ~&#93;$ sudo systemctl enable vncserver@:1
 
-</terminal>
+</finastacio>
 
 <p>
 After all that it is still possible that Tiger VNC will not start.  If you look in /var/log/messages there may be a line saying thate systemd cannot write to a PID file. This could be due to SELinux and you can fix it by changing the SELinux properties for systemd as shown below.  The commands below will not work prop
 </p>
 
-<terminal caption="Change .vnc SELinux properties">
+<finastacio apudskribo="Change .vnc SELinux properties">
 
 &#91;chris ~&#93;$ sudo ausearch -c 'systemd' --raw | sudo audit2allow -M my-systemd
 &#91;chris ~&#93;$ sudo semodule -X 300 -i my-systemd.pp
 
-</terminal>
+</finastacio>
 
 <p>
 The last step of the server setup is to open up your firewall.  If you are using firewalld you can run firewall-config and select "vnc-server" under services in the runtime and permanent configurations.  If you are using a different firewall you will probably want to open up ports 5900 to 6000.

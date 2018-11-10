@@ -43,35 +43,40 @@ Sybase Text columns.  Below I provide the SQL I used in this program.
 
 The first is SQL to pull table and column names for every table that had a Text column.
 
-<span class="codeCaption">Findy text columns</span>
-<pre class="prettifyprint">
+<kodo apudskribo="Find text columns">
+```
   select o.name as tableName, c.name as columnName from sysobjects o 
         inner join syscolumns c on c.id = o.id 
         inner join systypes t on t.usertype = c.usertype and t.type = c.type 
         where t.name = 'text' AND o.loginame='my_user' order by o.name;
-</pre>
+```
+</kodo>
 
 Then using the table and column name run the following queries to find the row count along with the max, min and average sizes of the text columns.
 
-<span class="codeCaption">row count</span>
-<pre class="prettifyprint">
+<kodo apudskribo="row count">
+```
   select count(*) from table_name
-</pre>
+```
+</kodo>
 
-<span class="codeCaption">max data size</span>
-<pre class="prettifyprint">
+<kodo apudskribo="max data size">
+```
   select max(datalength(column_name)) from table_name
-</pre>
+```
+</kodo>
 
-<span class="codeCaption">min data size</span>
-<pre class="prettifyprint">
+<kodo apudskribo="min data size">
+```
   select min(datalength(column_name)) from table_name
-</pre>
+```
+</kodo>
 
-<span class="codeCaption">avg data size</span>
-<pre class="prettifyprint">
+<kodo apudskribo="avg data size">
+```
   select avg(datalength(column_name)) from table_name
-</pre>
+```
+</kodo>
 
 I then consolidated this data into a text report similar to the following:
 
@@ -93,8 +98,8 @@ With this information I was able to modify the table creation SQL scripts to use
 that should meet our needs.  As an example I have shown the DDL that I used for the 
 BackgroundTask table.
 
-<span class="codeCaption">create table with CLOB size specified</span>
-<pre class="prettifyprint">
+<kodo apudskribo="create table with CLOB size specified">
+```
 create table BackgroundTask (
 	backgroundTaskId number(30,0) not null primary key,
 	groupId number(30,0),
@@ -113,12 +118,13 @@ create table BackgroundTask (
 	statusMessage clob null
 )
 LOB ( taskContext ) STORE AS ( TABLESPACE IKROME_LOB_DATA STORAGE ( INITIAL 256K NEXT 256K ) CHUNK 8192 NOCACHE LOGGING PCTVERSION 0) TABLESPACE IKROME_DATA STORAGE ( INITIAL 256K NEXT 256K );
-</pre>
+```
+</kodo>
 
 Now that I had tables capable of holding larger data sizes it was time to test the Data Migration again.  Right away we run into a problem.  The Data Migration doesn't copy data if the table already exists in the target database.  The root of the problem lies in the [com.liferay.portal.convert.ConvertDatabase](https://docs.liferay.com/portal/6.2/javadocs-all/src-html/com/liferay/portal/convert/ConvertDatabase.html#line.271) classs' migrateTable method (shown below).  
 
-<span class="codeCaption">Original migrateTable method</span>
-<pre class="prettifyprint">
+<kodo apudskribo="Original migrateTable method">
+```
             protected void migrateTable(
                             DB db, Connection connection, String tableName, Object[][] columns,
                             String sqlCreate)
@@ -141,13 +147,16 @@ Now that I had tables capable of holding larger data sizes it was time to test t
                             MaintenanceUtil.appendStatus(e.getMessage());
                     }
             }
-</pre>
+```
+</kodo>
 
 As can be seen if the SQL to create a table throws an exception then the table will not be populated.  My solution 
 was to copy and modify the ConvertDatabase class.  My new class, call ModifiedConvertDatabase, was modified to the following.
 
 <span class="codeCaption">modified migrate table method</span>
-<pre class="prettifyprint">
+<kodo apudskribo="modified migrate table method">
+
+```
 protected void migrateTable(DB db, Connection connection, String tableName, Object[][] columns, String sqlCreate)
       throws Exception {
 
@@ -186,26 +195,29 @@ protected void migrateTable(DB db, Connection connection, String tableName, Obje
     }
     return returnValue;
   }
-
-</pre>
+```
+</kodo>
 
 In this modified code the table creation SQL is only run if the table doesn't already exist.  This way if the table doesn't exist
 it is created and populated.  If it does exist it is only populated.  Now we need to configure Liferay to use our new class.  Add or update the [convert.processes](https://docs.liferay.com/portal/6.2/propertiesdoc/portal.properties.html) to the following in portal-ext.properties.
 
-<span class="codeCaption">portal-ext.properties</span>
-<pre class="prettifyprint">
+<kodo apudskribo="portal-ext.properties">
+
+```
 convert.processes=com.example.ModifiedConvertDatabase,\
   com.liferay.portal.convert.ConvertDocumentLibrary,\
   com.liferay.portal.convert.ConvertDocumentLibraryExtraSettings,\
   com.liferay.portal.convert.ConvertWikiCreole
-</pre>
+```
+</kodo>
 
 With these modifications in place I had my first successful Data migration.  How would I know if all the data transferred
 correctly?  My first step was to create a SQL script that counted tables rows for all the tables.  I could run this against
 both Oracle and Sybase.  An excerpt is below.
 
-<span class="codeCaption">row count union</span>
-<pre class="prettifyprint">
+<kodo apudskribo="row count union">
+
+```
 SELECT 'ACCOUNT_', count(*) FROM ACCOUNT_
 UNION
 SELECT 'ADDRESS', count(*) FROM ADDRESS
@@ -215,7 +227,8 @@ UNION
 SELECT 'ANNOUNCEMENTSENTRY', count(*) FROM ANNOUNCEMENTSENTRY
 UNION
 SELECT 'ANNOUNCEMENTSFLAG', count(*) FROM ANNOUNCEMENTSFLAG
-</pre>
+```
+</kodo>
 
 Using a diff tool I compared the results and found that they matched.  Whew!  Looking pretty good so far.
 I know my row counts are good but what about my data?  Did those large clob columns transfer correctly?

@@ -7,7 +7,8 @@ category=Tech Tip
 ~~~~~~
 Grep file return unique values
 <!--summary marker-->
-<span class="codeCaption prettyprint">Command Line</span>
-<pre class="terminal">
+<finastacio apudskribo="Command Line">
+```
 grep -oh "^[0-9,\.]*[ ]" localhost_access_log.2018-05-07.txt | sort -u
-</pre>
+```
+</finastacio>

@@ -39,7 +39,7 @@ public class CMLToHTMLTest {
             Elements metaTags = html.select("meta");
             Assert.assertTrue("Did not find multiple meta tags.", metaTags.size() > 5);
             
-            Elements terminals = html.select("terminal");
+            Elements terminals = html.select("finastacio");
             Assert.assertTrue("Did not find multiple terminal tags.", terminals.size() > 6);
 
             Elements metaType = html.select("meta[name=type]");
@@ -60,7 +60,7 @@ public class CMLToHTMLTest {
         try {
             Document html = Jsoup.parse(htmlFile, "UTF-8");
 
-            Elements terminals = html.select("terminal");
+            Elements terminals = html.select("finastacio");
             Assert.assertTrue("Did not find multiple terminal tags.", terminals.size() > 6);
 
             Elements captions = html.select("span[class=codeCaption]");
@@ -70,7 +70,7 @@ public class CMLToHTMLTest {
             Assert.assertTrue("Should not find any code captions.", preTerminals.size() < 1);
 
             Element terminal = terminals.get(0);
-            String caption = terminal.attr("caption");
+            String caption = terminal.attr("apudskribo");
             Assert.assertEquals("Did not have correct caption.", "Stop Tiger VNC", caption );
 
             Element captionNode = new Element("span");
@@ -126,8 +126,8 @@ public class CMLToHTMLTest {
 
             Document html = Jsoup.parse(markdownHtml, "UTF-8");
 
-            Elements codes = html.select("pre[class=prettifyprint]");
-            Assert.assertTrue("Did not find multiple pre tags containing code.", codes.size() > 3);
+            Elements codes = html.select("kodo");
+            Assert.assertTrue("Did not find multiple kodo tags containing code.", codes.size() > 3);
 
         } catch (IOException exception) {
             Assert.fail("Unable to find file " + markdownFile.toAbsolutePath());

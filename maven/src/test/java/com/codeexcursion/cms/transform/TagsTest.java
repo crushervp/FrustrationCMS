@@ -22,12 +22,12 @@ public class TagsTest {
 
             Document html = Jsoup.parse(
                 "<div>\n" +
-                "<code caption=\"HTML\"> <span>html<span></code>\n" +
-                "<code caption=\"More HTML\"> <span>more html<span></code>\n" +
+                "<kodo apudskribo=\"HTML\"> <span>html<span></kodo>\n" +
+                "<kodo apudskribo=\"More HTML\"> <span>more html<span></kodo>\n" +
                 "</div>\n"
                 );
 
-            Elements codes = html.select("code");
+            Elements codes = html.select(Tags.CODE);
             Assert.assertTrue("Did not find multiple code tags.", codes.size() > 1);
 
             Elements captions = html.select("span[class=codeCaption]");
@@ -66,12 +66,12 @@ public class TagsTest {
 
             Document html = Jsoup.parse(
                 "<div>\n" +
-                "<code caption=\"HTML\"> <span>html<span></code>\n" +
-                "<code caption=\"More HTML\"> <span>more html<span></code>\n" +
+                "<kodo apudskribo=\"HTML\"> <span>html<span></kodo>\n" +
+                "<kodo apudskribo=\"More HTML\"> <span>more html<span></kodo>\n" +
                 "</div>\n"
                 );
 
-            Elements codes = html.select("code");
+            Elements codes = html.select(Tags.CODE);
             Assert.assertTrue("Did not find multiple code tags.", codes.size() > 1);
 
             Elements captions = html.select("span[class=codeCaption]");

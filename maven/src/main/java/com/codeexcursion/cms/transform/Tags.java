@@ -6,11 +6,15 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.TextNode;
 
 public final class Tags {
+    public final static String TERMINAL = "finastacio";
+    public final static String CODE= "kodo";
+    public final static String CAPTION = "apudskribo";
+    public final static String LANGUAGE = "lingvo";
 
-    public final static Optional<Element> getCaption(Element terminal) {
-        Optional.ofNullable(terminal).orElseThrow(IllegalArgumentException::new);
+    public final static Optional<Element> getCaption(Element customTag) {
+        Optional.ofNullable(customTag).orElseThrow(IllegalArgumentException::new);
         Element captionNode = null;
-        String caption = terminal.attr("caption");
+        String caption = customTag.attr(CAPTION);
         if (caption != null && !caption.isEmpty()) {
             captionNode = new Element("span");
             captionNode.attr("class", "codeCaption");
@@ -19,11 +23,11 @@ public final class Tags {
         return Optional.ofNullable(captionNode);
     }
 
-    public final static Element getContent(Element node, String cssClass) {
+    public final static Element getContent(Element customTag, String cssClass) {
         Optional.ofNullable(cssClass).orElseThrow(IllegalArgumentException::new);
-        Element returnNode = getContent(node);
+        Element returnNode = getContent(customTag);
         returnNode.attr("class", cssClass);
-        returnNode.appendChild(new TextNode(node.html()));
+        returnNode.appendChild(new TextNode(customTag.html()));
         return returnNode;
     }
     

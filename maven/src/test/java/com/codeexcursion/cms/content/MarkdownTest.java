@@ -116,14 +116,8 @@ public class MarkdownTest {
         } catch (IllegalArgumentException exception) {
           //do NOthing
         }
-        
-        
     }
     
-    
-    
-    
-
     @Test
     public void codeBlockTest1() {
         String text = "<code caption=\"bob\">for(int i = 0; i < 20;i++) {\n" +
@@ -132,7 +126,7 @@ public class MarkdownTest {
             Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
-//            System.out.println(html);
+            //System.out.println(html);
 
     }
 
@@ -148,6 +142,32 @@ public class MarkdownTest {
 
     }
 
+    
+    @Test
+    public void codeBlockTest4() {
+        String text = "<fons>\n\n" + 
+                      "```java" +
+                      "    for(int i = 0; i < 20;i++) {\n" +
+                      "      //do nothing for now\n" +
+                      "    }\n" +
+                      "```\n</fons>\n";
+            Optional<String> html = Markdown.getHTML(text);
+            Assert.assertTrue("HTML should not be null", html.isPresent());
+            Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+            System.out.println(html);
+
+    }
+    
+    
+    
     @Test
     public void codeBlockTest3() {
         String text = "<pre>for(int i = 0; i < 20;i++) {\n" +
@@ -172,6 +192,8 @@ public class MarkdownTest {
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
 
     }
+
+
 
     
     

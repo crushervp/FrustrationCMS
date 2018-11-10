@@ -22,10 +22,10 @@ public final class HTML {
     public static final Optional<String> transform(String html) {
         Optional.ofNullable(html).orElseThrow(IllegalArgumentException::new);
         Document htmlDocument = Jsoup.parse(html);
-        Elements terminals = htmlDocument.select("terminal");
+        Elements terminals = htmlDocument.select(Tags.TERMINAL);
         Optional.ofNullable(terminals).ifPresent(HTML::handleTerminals);
 
-        Elements codeBlocks = htmlDocument.select("code");
+        Elements codeBlocks = htmlDocument.select(Tags.CODE);
         Optional.ofNullable(codeBlocks).ifPresent(HTML::handleCodeBlocks);
 
         return Optional.ofNullable(htmlDocument.html());
