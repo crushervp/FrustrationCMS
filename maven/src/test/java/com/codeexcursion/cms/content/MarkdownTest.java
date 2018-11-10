@@ -154,15 +154,7 @@ public class MarkdownTest {
             Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
-            System.out.println(html);
+           // System.out.println(html);
 
     }
     

@@ -21,14 +21,18 @@ public final class HTML {
 
     public static final Optional<String> transform(String html) {
         Optional.ofNullable(html).orElseThrow(IllegalArgumentException::new);
-        Document htmlDocument = Jsoup.parse(html);
-        Elements terminals = htmlDocument.select(Tags.TERMINAL);
-        Optional.ofNullable(terminals).ifPresent(HTML::handleTerminals);
 
-        Elements codeBlocks = htmlDocument.select(Tags.CODE);
-        Optional.ofNullable(codeBlocks).ifPresent(HTML::handleCodeBlocks);
+        Optional<Document> dom = Optional.ofNullable(Jsoup.parse(html));
 
-        return Optional.ofNullable(htmlDocument.html());
+        dom
+          .flatMap((htmlDocument) -> Optional.ofNullable(htmlDocument.select(Tags.TERMINAL)))
+          .ifPresent(HTML::handleTerminals);
+
+        dom
+          .flatMap((htmlDocument) -> Optional.ofNullable(htmlDocument.select(Tags.CODE)))
+          .ifPresent(HTML::handleCodeBlocks);
+        
+        return dom.flatMap((htmlDocument) -> Optional.ofNullable(htmlDocument.html()));
     }
 
 
@@ -51,11 +55,11 @@ public final class HTML {
 
     private final static void replace(Element currentElement, String cssClass) {
         Tags.getCaption(currentElement).ifPresent(currentElement::before);
-        replace(currentElement, Tags.getContent(currentElement, cssClass));
+        currentElement.tagName("pre");
+        currentElement.attr("class", cssClass);
+        currentElement.removeAttr(Tags.CAPTION);
+        currentElement.removeAttr(Tags.LANGUAGE);
     }    
 
-    private final static void replace(Element currentElement, Element newElement) {
-      Optional.of(newElement).ifPresent(currentElement::replaceWith);
-    }
 
 }

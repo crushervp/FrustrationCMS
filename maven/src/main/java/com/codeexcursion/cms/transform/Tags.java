@@ -23,21 +23,4 @@ public final class Tags {
         return Optional.ofNullable(captionNode);
     }
 
-    public final static Element getContent(Element customTag, String cssClass) {
-        Optional.ofNullable(cssClass).orElseThrow(IllegalArgumentException::new);
-        Element returnNode = getContent(customTag);
-        returnNode.attr("class", cssClass);
-        returnNode.appendChild(new TextNode(customTag.html()));
-        return returnNode;
-    }
-    
-    public final static Element getContent(Element node) {
-        Optional.ofNullable(node).orElseThrow(IllegalArgumentException::new);
-        Element returnNode = new Element("pre");
-        returnNode.appendChild(new TextNode(node.html()));
-        return returnNode;
-    }
-    
-
-    
 }

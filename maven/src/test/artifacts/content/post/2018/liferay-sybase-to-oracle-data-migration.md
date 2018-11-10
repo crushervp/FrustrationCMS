@@ -44,6 +44,7 @@ Sybase Text columns.  Below I provide the SQL I used in this program.
 The first is SQL to pull table and column names for every table that had a Text column.
 
 <kodo apudskribo="Find text columns">
+
 ```
   select o.name as tableName, c.name as columnName from sysobjects o 
         inner join syscolumns c on c.id = o.id 
@@ -55,24 +56,28 @@ The first is SQL to pull table and column names for every table that had a Text 
 Then using the table and column name run the following queries to find the row count along with the max, min and average sizes of the text columns.
 
 <kodo apudskribo="row count">
+
 ```
   select count(*) from table_name
 ```
 </kodo>
 
 <kodo apudskribo="max data size">
+
 ```
   select max(datalength(column_name)) from table_name
 ```
 </kodo>
 
 <kodo apudskribo="min data size">
+
 ```
   select min(datalength(column_name)) from table_name
 ```
 </kodo>
 
 <kodo apudskribo="avg data size">
+
 ```
   select avg(datalength(column_name)) from table_name
 ```
@@ -99,6 +104,7 @@ that should meet our needs.  As an example I have shown the DDL that I used for 
 BackgroundTask table.
 
 <kodo apudskribo="create table with CLOB size specified">
+
 ```
 create table BackgroundTask (
 	backgroundTaskId number(30,0) not null primary key,
@@ -124,6 +130,7 @@ LOB ( taskContext ) STORE AS ( TABLESPACE IKROME_LOB_DATA STORAGE ( INITIAL 256K
 Now that I had tables capable of holding larger data sizes it was time to test the Data Migration again.  Right away we run into a problem.  The Data Migration doesn't copy data if the table already exists in the target database.  The root of the problem lies in the [com.liferay.portal.convert.ConvertDatabase](https://docs.liferay.com/portal/6.2/javadocs-all/src-html/com/liferay/portal/convert/ConvertDatabase.html#line.271) classs' migrateTable method (shown below).  
 
 <kodo apudskribo="Original migrateTable method">
+
 ```
             protected void migrateTable(
                             DB db, Connection connection, String tableName, Object[][] columns,
