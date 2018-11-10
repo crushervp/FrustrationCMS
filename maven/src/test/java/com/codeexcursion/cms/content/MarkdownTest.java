@@ -25,7 +25,7 @@ public class MarkdownTest {
         Path markdownFile = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
         try {
             String text = new String(Files.readAllBytes(markdownFile));
-            Optional<Document> document = Markdown.getDocument(null, text);
+            Optional<Document> document = Markdown.getDocument(text);
             Assert.assertTrue("Markdown document should not be null", document.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", document.get().getLineCount() > 1);
 
@@ -40,7 +40,7 @@ public class MarkdownTest {
         Path markdownFile = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
         try {
             String text = new String(Files.readAllBytes(markdownFile));
-            Optional<String> html = Markdown.getHTML(null, Markdown.getDocument(null, text).get());
+            Optional<String> html = Markdown.getHTML(Markdown.getDocument(text).get());
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
 
@@ -55,7 +55,7 @@ public class MarkdownTest {
         Path markdownFile = Paths.get("src/test/artifacts/content/post/2018/liferay-sybase-to-oracle-data-migration.md");
         try {
             String text = new String(Files.readAllBytes(markdownFile));
-            Optional<String> html = Markdown.getHTML(null, text);
+            Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
 
@@ -65,13 +65,71 @@ public class MarkdownTest {
 
     }
     
+    @Test
+    public void nullTest() {
+        try {
+            Markdown.getDocument(null, "<div><div>");
+            Assert.fail("Failed to throw IllegalArgumentException");
+
+        } catch (IllegalArgumentException exception) {
+          //do NOthing
+        }
+
+        try {
+            Markdown.getDocument(new MutableDataSet(), null);
+            Assert.fail("Failed to throw IllegalArgumentException");
+
+        } catch (IllegalArgumentException exception) {
+          //do NOthing
+        }
+
+        try {
+            Markdown.getHTML(null, "<div><div>");
+            Assert.fail("Failed to throw IllegalArgumentException");
+
+        } catch (IllegalArgumentException exception) {
+          //do NOthing
+        }
+
+        try {
+            String markdown = null;
+            Markdown.getHTML(new MutableDataSet(), markdown);
+            Assert.fail("Failed to throw IllegalArgumentException");
+
+        } catch (IllegalArgumentException exception) {
+          //do NOthing
+        }
+
+        try {
+            Markdown.getHTML(null, Markdown.getDocument("<div><div>").get());
+            Assert.fail("Failed to throw IllegalArgumentException");
+
+        } catch (IllegalArgumentException exception) {
+          //do NOthing
+        }
+
+        try {
+            Document markdown = null;
+            Markdown.getHTML(new MutableDataSet(), markdown);
+            Assert.fail("Failed to throw IllegalArgumentException");
+
+        } catch (IllegalArgumentException exception) {
+          //do NOthing
+        }
+        
+        
+    }
+    
+    
+    
+    
 
     @Test
     public void codeBlockTest1() {
         String text = "<code caption=\"bob\">for(int i = 0; i < 20;i++) {\n" +
                       "//do nothing\n" +
                       "}</code>";
-            Optional<String> html = Markdown.getHTML(null, text);
+            Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
 //            System.out.println(html);
@@ -83,7 +141,7 @@ public class MarkdownTest {
         String text = "    for(int i = 0; i < 20;i++) {\n" +
                       "      //do nothing for now\n" +
                       "    }\n";
-            Optional<String> html = Markdown.getHTML(null, text);
+            Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
 //            System.out.println(html);
@@ -95,7 +153,7 @@ public class MarkdownTest {
         String text = "<pre>for(int i = 0; i < 20;i++) {\n" +
                       "      //do nothing for now\n" +
                       "    }</pre>";
-            Optional<String> html = Markdown.getHTML(null, text);
+            Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
  //           System.out.println(html);
@@ -109,7 +167,7 @@ public class MarkdownTest {
         String text = "<terminal>for(int i = 0; i < 20;i++) {\n" +
                       "//do nothing\n" +
                       "}</terminal>";
-            Optional<String> html = Markdown.getHTML(null, text);
+            Optional<String> html = Markdown.getHTML(text);
             Assert.assertTrue("HTML should not be null", html.isPresent());
             Assert.assertTrue("Markdown document should have multiple lines", html.get().length() > 50);
 
